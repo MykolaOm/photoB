@@ -8,8 +8,8 @@
 
 import Foundation
 import SwiftyJSON
-import SDWebImage
-// https://api.unsplash.com/photos/random?count=5&client_id=7d9dc72fb146b796454d691116f046cfac466970ef2ea7af2089e1107543c9a0
+/* https://api.unsplash.com/photos/random?count=5&client_id=7d9dc72fb146b796454d691116f046cfac466970ef2ea7af2089e1107543c9a0
+*/
 
 class Constants {
     private init(){}
