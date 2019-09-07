@@ -78,7 +78,8 @@ class ViewController: UICollectionViewController {
         guard let url = urlComp?.url else { return }
         NetworkService.shared.getRequest(to: url, completion: { (result) in
             for item in result {
-                let occurances = self.userL.filter{ $0.imageInfo?.imageURL == item.imageInfo?.imageURL }
+                let occurances = self.userL.filter{ $0.imageInfo != nil && $0.imageInfo?.imageURL != nil &&  $0.imageInfo?.imageURL == item.imageInfo?.imageURL
+                }
                 if occurances.count == 0 {
                     self.userL.append(item)
                 }
