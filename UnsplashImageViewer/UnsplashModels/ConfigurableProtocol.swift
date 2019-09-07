@@ -8,13 +8,13 @@
 
 import Foundation
 
-protocol Configurator {}
+//protocol Configurator {}
+//
+//protocol UnsplashConfigurator: Configurator {}
 
-protocol UnsplashConfigurator: Configurator {}
+//protocol Configurable {
+//    associatedtype T
+//    func configure(with model: T)
+//}
 
-protocol Configurable {
-    associatedtype T
-    func configure(with model: T)
-}
-
-protocol UnsplashConfigurable: Configurable {}
+//protocol UnsplashConfigurable: Configurable {}

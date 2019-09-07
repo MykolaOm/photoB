@@ -17,9 +17,8 @@ enum ImageType {
 class ViewController: UICollectionViewController {
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    private let user: [UnsplashUserEntity] = []
+    private var userL: [UnsplashUserEntity] = []
     private var itemsToDownload: Int = 1 // min or max allowed = 10...
-    private var unsplashUsers : [UnsplashUser] = []
     private var selectedIndex: Int = 0
     private let persistanceManager = PersistanceManager.shared
     private let cashe = ImageCache()
@@ -30,7 +29,8 @@ class ViewController: UICollectionViewController {
         collectionView.refreshControl = refreshControl
         activityIndicator.hidesWhenStopped = true
         activityIndicator.startAnimating()
-        unsplashUsers = coredataHelper.getData()
+        userL = coredataHelper.getData()
+
         requestData()
     }
    
@@ -50,17 +50,18 @@ class ViewController: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return unsplashUsers.count
+        return userL.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "unsplashCell", for: indexPath) as! UnsplashCell
-        cell.configure(with: unsplashUsers[indexPath.item])
+        cell.configure(with: userL[indexPath.item])
+        cell.imageView.image = cashe.getImage(url: userL[indexPath.item].imageInfo!.imageURL!)
         return cell
     }
     
     private func reloadView(){
-        if unsplashUsers.count != 0 {
+        if userL.count != 0 {
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
                 self.activityIndicator.stopAnimating()
@@ -77,28 +78,32 @@ class ViewController: UICollectionViewController {
         guard let url = urlComp?.url else { return }
         NetworkService.shared.getRequest(to: url, completion: { (result) in
             for item in result {
-                let occurances = self.unsplashUsers.filter{ $0.imageInfo.imageURL == item.imageInfo.imageURL }
+                let occurances = self.userL.filter{ $0.imageInfo?.imageURL == item.imageInfo?.imageURL }
                 if occurances.count == 0 {
-                    self.unsplashUsers.append(item as! UnsplashUser)
+                    self.userL.append(item)
                 }
             }
-            for index in 0..<self.unsplashUsers.count {
-                self.singleImage(type: .picture, index: index, url: self.unsplashUsers[index].imageInfo.imageURL!)
-                self.singleImage(type: .profile, index: index, url: self.unsplashUsers[index].userThumb!)
+            for index in 0..<self.userL.count {
+                let img = self.cashe.getImage(url: (self.userL[index].imageInfo?.imageURL!)!)
+                self.userL[index].imageInfo?.image = NSData(data: (img?.pngData())!)
+                let userT = self.cashe.getImage(url: self.userL[index].userTumb!)
+                self.userL[index].profileImage = NSData(data: (userT?.pngData())!)
             }
-            self.coredataHelper.saveUserData(unsplashUsers: self.unsplashUsers)
+            
+            self.coredataHelper.saveUserData(unsplashUsers: self.userL)
             self.increaseItemsToDownload()
             self.reloadView()
         })
     }
+    
     // TODO: remove from VC to separate module
-    private func singleImage(type: ImageType, index: Int, url: URL ){
-        let image = cashe.getImage(url: url)
-        switch type {
-            case .picture:  self.unsplashUsers[index].imageInfo.image = image
-            case .profile:  self.unsplashUsers[index].profileImage = image
-        }
-    }
+//    private func singleImage(type: ImageType, index: Int, url: URL ){
+//        let image = cashe.getImage(url: url)
+//        switch type {
+//            case .picture:  self.unsplashUsers[index].imageInfo.image = image
+//            case .profile:  self.unsplashUsers[index].profileImage = image
+//        }
+//    }
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.item
     }
@@ -139,8 +144,9 @@ class ViewController: UICollectionViewController {
         func collectionView(_ collectionView: UICollectionView,
                             layout collectionViewLayout: UICollectionViewLayout,
                             sizeForItemAt indexPath: IndexPath) -> CGSize {
-            let correlation: Double = Double(unsplashUsers[indexPath.item].imageInfo.height) / Double(
-                unsplashUsers[indexPath.item].imageInfo.width)
+            let hI = Int(userL[indexPath.item].imageInfo!.height)
+            let wI = Int(userL[indexPath.item].imageInfo!.width)
+            let correlation: Double = Double(hI) / Double(wI)
             return getSize(index: indexPath.item, correlation: correlation)
         }
 }

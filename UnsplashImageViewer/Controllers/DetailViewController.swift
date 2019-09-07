@@ -16,7 +16,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var location: UILabel!
     @IBOutlet weak var profileImage: UIImageView!
     
-    var user: UnsplashUser?
+    var user: UnsplashUserEntity?
     var image: UIImage?
     var imageView = UIImageView()
     
@@ -83,8 +83,11 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         authorName.text = details.userName
         instaName.text = details.instaName
         instaName.textColor = .blue
-        location.text = details.imageInfo.location
-        profileImage.image = details.profileImage
+        location.text = details.imageInfo?.location
+        if let nsdata = details.profileImage {
+            let data = Data(referencing: nsdata)
+            profileImage.image = UIImage(data: data)
+        }
     }
     private func initials(){
         scrollView.delegate = self

@@ -32,7 +32,9 @@ class NetworkService {
     var requestedItemsNumb: Int = 0
 //    let randomRequestParam: String = "random?count="
     
-    func getRequest(to url: URL, completion: @escaping ([JsonAdopted])->Void) {
+//    func getRequest(to url: URL, completion: @escaping ([JsonAdopted])->Void) {
+    func getRequest(to url: URL, completion: @escaping ([UnsplashUserEntity])->Void) {
+
         let session = URLSession.shared
         session.dataTask(with: url) { data, response, error in
             guard let data = data else { return }
@@ -56,20 +58,37 @@ class NetworkService {
         return link
     }
     
-    func parseJson(data: Data) -> [JsonAdopted] {
-        var users: [JsonAdopted] = []
+    func parseJson(data: Data) -> [UnsplashUserEntity] {
+//        var users: [JsonAdopted] = []
+        var users: [UnsplashUserEntity] = []
+
         if let json = try? JSON(data: data) {
             for index in 0..<json.count {
-                let imageInfo = ImageInfo(description: json[index]["description"].string ?? "",
-                                          location: json[index]["location"].string ?? "",
-                                          width: json[index]["width"].int ?? 0,
-                                          height: json[index]["height"].int ?? 0,
-                                          imageUrl: json[index]["urls"]["thumb"].url ?? nil)
-                users.append(UnsplashUser(name: json[index]["user"]["name"].string ?? "",
-                                          userName: json[index]["user"]["username"].string ?? "",
-                                          userThumb: json[index]["user"]["profile_image"]["large"].url ?? nil,
-                                          instaName: json[index]["user"]["instagram_username"].string ?? "",
-                                          imageInfo: imageInfo))
+                let imgInfo = ImagesEntity(context: PersistanceManager.shared.context)
+                imgInfo.imageDescription = json[index]["description"].string ?? ""
+                imgInfo.imageURL = json[index]["urls"]["thumb"].url ?? nil
+                imgInfo.location = json[index]["location"].string ?? ""
+                imgInfo.height   = json[index]["height"].int16 ?? 0
+                imgInfo.width    = json[index]["width"].int16 ?? 0
+                
+                let user = UnsplashUserEntity(context: PersistanceManager.shared.context)
+                user.name = json[index]["user"]["name"].string ?? ""
+                user.instaName = json[index]["user"]["instagram_username"].string ?? ""
+                user.userName = json[index]["user"]["username"].string ?? ""
+                user.userTumb = json[index]["user"]["profile_image"]["large"].url ?? nil
+                user.imageInfo = imgInfo
+                
+                users.append(user)
+//                let imageInfo = ImageInfo(description: json[index]["description"].string ?? "",
+//                                          location: json[index]["location"].string ?? "",
+//                                          width: json[index]["width"].int ?? 0,
+//                                          height: json[index]["height"].int ?? 0,
+//                                          imageUrl: json[index]["urls"]["thumb"].url ?? nil)
+//                users.append(UnsplashUser(name: json[index]["user"]["name"].string ?? "",
+//                                          userName: json[index]["user"]["username"].string ?? "",
+//                                          userThumb: json[index]["user"]["profile_image"]["large"].url ?? nil,
+//                                          instaName: json[index]["user"]["instagram_username"].string ?? "",
+//                                          imageInfo: imageInfo))
                 
             }
         }

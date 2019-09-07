@@ -8,7 +8,8 @@
 
 import UIKit
 
-class UnsplashCell: UICollectionViewCell, UnsplashConfigurable {
+//class UnsplashCell: UICollectionViewCell, UnsplashConfigurable {
+class UnsplashCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView! {
         didSet {
             self.layoutSubviews()
@@ -18,16 +19,20 @@ class UnsplashCell: UICollectionViewCell, UnsplashConfigurable {
     @IBOutlet weak var stack: UIStackView!
     @IBOutlet weak var author: UILabel!
     @IBOutlet weak var imageDescription: UILabel!
-    var user: UnsplashUser?
+    var user: UnsplashUserEntity?
     
-    func configure(with model: UnsplashConfigurator){
-        self.user = model as? UnsplashUser
+//    func configure(with model: UnsplashConfigurator){
+    func configure(with model: UnsplashUserEntity){
+        self.user = model
         guard let usr = user else { return }
         initiate(from: usr)
     }
-    private func initiate(from model: UnsplashUser) {
+    private func initiate(from model: UnsplashUserEntity) {
         author.text = model.name
-        imageDescription.text = model.imageInfo.description
-        imageView.image = model.imageInfo.image
+        imageDescription.text = model.imageInfo?.imageDescription
+//        if let imgData = model.imageInfo?.image {
+//            let data = Data(imgData)
+//            imageView.image = UIImage(data: data)
+//        }
     }
 }
