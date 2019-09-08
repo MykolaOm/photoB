@@ -8,7 +8,6 @@
 
 import UIKit
 
-//class UnsplashCell: UICollectionViewCell, UnsplashConfigurable {
 class UnsplashCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView! {
         didSet {
@@ -21,7 +20,6 @@ class UnsplashCell: UICollectionViewCell {
     @IBOutlet weak var imageDescription: UILabel!
     var user: UnsplashUserEntity?
     
-//    func configure(with model: UnsplashConfigurator){
     func configure(with model: UnsplashUserEntity){
         self.user = model
         guard let usr = user else { return }
@@ -30,9 +28,5 @@ class UnsplashCell: UICollectionViewCell {
     private func initiate(from model: UnsplashUserEntity) {
         author.text = model.name
         imageDescription.text = model.imageInfo?.imageDescription
-//        if let imgData = model.imageInfo?.image {
-//            let data = Data(imgData)
-//            imageView.image = UIImage(data: data)
-//        }
     }
 }

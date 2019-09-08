@@ -44,6 +44,15 @@ class NetworkService {
                 }
         }.resume()
     }
+    func getUrlForRandomPhotos(count:Int) -> URL? {
+        var urlComp = URLComponents(string: Constants.shared.urlString)
+        urlComp?.queryItems = [
+            URLQueryItem(name: "random count", value: String(count)),
+            URLQueryItem(name: "client_id", value: AppUserInfo.shared.accessKey)
+        ]
+        guard let url = urlComp?.url else { return nil}
+        return url
+    }
     
     func getImageFromLink(url: URL, completion: @escaping (UIImage) -> Void ) {
         guard let data = try? Data.init(contentsOf: url) else { return }
@@ -59,7 +68,6 @@ class NetworkService {
     }
     
     func parseJson(data: Data) -> [UnsplashUserEntity] {
-//        var users: [JsonAdopted] = []
         var users: [UnsplashUserEntity] = []
 
         if let json = try? JSON(data: data) {
@@ -79,17 +87,6 @@ class NetworkService {
                 user.imageInfo = imgInfo
                 
                 users.append(user)
-//                let imageInfo = ImageInfo(description: json[index]["description"].string ?? "",
-//                                          location: json[index]["location"].string ?? "",
-//                                          width: json[index]["width"].int ?? 0,
-//                                          height: json[index]["height"].int ?? 0,
-//                                          imageUrl: json[index]["urls"]["thumb"].url ?? nil)
-//                users.append(UnsplashUser(name: json[index]["user"]["name"].string ?? "",
-//                                          userName: json[index]["user"]["username"].string ?? "",
-//                                          userThumb: json[index]["user"]["profile_image"]["large"].url ?? nil,
-//                                          instaName: json[index]["user"]["instagram_username"].string ?? "",
-//                                          imageInfo: imageInfo))
-                
             }
         }
         return users

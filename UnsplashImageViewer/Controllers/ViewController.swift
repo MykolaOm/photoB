@@ -68,14 +68,8 @@ class ViewController: UICollectionViewController {
             }
         }
     }
-    // TODO: remove from VC to separate module
     private func requestData(){
-        var urlComp = URLComponents(string: Constants.shared.urlString)
-        urlComp?.queryItems = [
-            URLQueryItem(name: "random count", value: String(itemsToDownload)),
-            URLQueryItem(name: "client_id", value: AppUserInfo.shared.accessKey)
-        ]
-        guard let url = urlComp?.url else { return }
+        guard let url = NetworkService.shared.getUrlForRandomPhotos(count:itemsToDownload) else { return }
         NetworkService.shared.getRequest(to: url, completion: { (result) in
             for item in result {
                 let occurances = self.userL.filter{ $0.imageInfo != nil && $0.imageInfo?.imageURL != nil &&  $0.imageInfo?.imageURL == item.imageInfo?.imageURL
@@ -96,15 +90,7 @@ class ViewController: UICollectionViewController {
             self.reloadView()
         })
     }
-    
-    // TODO: remove from VC to separate module
-//    private func singleImage(type: ImageType, index: Int, url: URL ){
-//        let image = cashe.getImage(url: url)
-//        switch type {
-//            case .picture:  self.unsplashUsers[index].imageInfo.image = image
-//            case .profile:  self.unsplashUsers[index].profileImage = image
-//        }
-//    }
+
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.item
     }

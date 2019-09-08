@@ -21,7 +21,7 @@ class UnsplashCoreDataHelper {
             }
         lastSavedCount = getData().count
     }
-    func getData() -> [UnsplashUserEntity] {//from entity: [UnsplashUserEntity]
+    func getData() -> [UnsplashUserEntity] {
         return persistanceManager.fetch(UnsplashUserEntity.self)
     }
     

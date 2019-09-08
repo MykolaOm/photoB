@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import MapKit
 
 class DetailViewController: UIViewController, UIScrollViewDelegate {
 
+    @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var authorName: UILabel!
     @IBOutlet weak var instaName: UILabel!
@@ -32,6 +34,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         initials()
         setUpSubviews()
         scrollView?.addSubview(imageView)
+        showPoint()
     }
     @objc private func shareObjects(){
         guard let img = image else { return }
@@ -92,5 +95,34 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     private func initials(){
         scrollView.delegate = self
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareObjects ))
+    }
+    
+    func showPoint() {
+        mapView.isHidden = true
+        if let searchString = location.text {
+//        let searchString = "Sweeden"
+//            let firstWord = searchString.components(separatedBy: " ").first
+            let searchRequest = MKLocalSearch.Request()
+            searchRequest.naturalLanguageQuery = searchString
+            let activeSearchg = MKLocalSearch(request: searchRequest)
+            activeSearchg.start { (response, error) in
+                if response == nil {
+                    print("error")
+                } else {
+                    let anotations = self.mapView.annotations
+                    self.mapView.removeAnnotations(anotations)
+                    
+                    let latitude = response?.boundingRegion.center.latitude
+                    let longitude = response?.boundingRegion.center.longitude
+                    
+                    let anotation = MKPointAnnotation()
+                    anotation.title = searchString
+                    anotation.coordinate = CLLocationCoordinate2DMake(latitude!, longitude!)
+                    self.mapView.addAnnotation(anotation)
+                    self.mapView.setCenter(anotation.coordinate, animated: true)
+                    self.mapView.isHidden = false
+                }
+            }
+        }
     }
 }
